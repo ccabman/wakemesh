@@ -1,0 +1,54 @@
+name: WakeMesh Engine
+version: "0.1.7"
+slug: wakemesh_engine
+description: Camera and network audio sources as Home Assistant voice satellites
+url: https://github.com/ccabman/wakemesh
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: manual
+init: false
+host_network: true
+homeassistant_api: true
+map:
+  - media:rw
+watchdog: tcp://[HOST]:8100
+ports:
+  8100/tcp: 8100
+options:
+  api_port: 8100
+  api_token: replace-with-a-long-random-token
+  home_assistant_url: http://homeassistant.local:8123
+  debug_logging: false
+  sources:
+    - id: example_source
+      stream_url: rtsp://go2rtc.local:8554/example_source
+      audio_gain_db: 12
+      assistants:
+        - id: test
+          enabled: false
+          name: WakeMesh Example
+          port: 6064
+          wake_word: hey_jarvis
+          stop_word: stop
+          response_player: media_player.living_room
+          response_volume: 0.3
+schema:
+  api_port: port
+  api_token: password
+  home_assistant_url: url
+  debug_logging: bool
+  sources:
+    - id: str
+      stream_url: url
+      audio_gain_db: int(0,30)
+      assistants:
+        - id: str
+          enabled: bool
+          name: str
+          port: port
+          wake_word: str
+          stop_word: str
+          response_player: str
+          response_volume: float(0,1)

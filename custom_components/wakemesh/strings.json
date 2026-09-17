@@ -1,0 +1,20 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to WakeMesh",
+        "description": "Connect Home Assistant to the locally installed router app.",
+        "data": {
+          "url": "Router URL",
+          "token": "API token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the router"
+    },
+    "abort": {
+      "already_configured": "This router is already configured"
+    }
+  }
+}

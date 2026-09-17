@@ -1,0 +1,4 @@
+.nofail
+load-module module-native-protocol-unix socket=/var/run/pulse/native auth-anonymous=1
+load-module module-always-sink
+.fail

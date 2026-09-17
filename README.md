@@ -2,6 +2,11 @@
 
 **Turn network audio sources into local Home Assistant voice satellites.**
 
+[![Tests](https://github.com/ccabman/wakemesh/actions/workflows/tests.yml/badge.svg)](https://github.com/ccabman/wakemesh/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/github/v/release/ccabman/wakemesh?include_prereleases&label=release)](https://github.com/ccabman/wakemesh/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-local%20voice-41BDF5.svg)](https://www.home-assistant.io/voice_control/)
+
 WakeMesh is an experimental audio processor and router for Home Assistant. It
 connects RTSP or go2rtc audio sources—such as cameras and doorbells—to Home
 Assistant Assist, then routes spoken responses to a selected media player.
@@ -115,4 +120,3 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 ## License
 
 WakeMesh is available under the [MIT License](LICENSE).
-

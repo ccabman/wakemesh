@@ -1,5 +1,25 @@
 # Configuration
 
+## AirPlay announcement destinations
+
+Add a destination from **Settings → Devices & services → WakeMesh → Add
+entry → AirPlay announcement destination**. Discovery automatically matches
+HomePods to their native Apple TV integration entities and removes destinations
+that are already configured.
+
+True stereo pairs are displayed as one destination and routed through the
+leader advertised by AirPlay. Temporary multi-room groups remain separate.
+
+Each destination creates:
+
+- A WakeMesh media player usable by TTS, Assist, scripts, and automations.
+- **Idle Announcement Volume**, the fixed level used when no media is playing.
+- **Playing Announcement Boost**, percentage points added to the current volume.
+
+During an announcement WakeMesh records playback state and volume, streams the
+audio directly over RAOP, restores the original volume, and resumes playback
+when it was previously active.
+
 ## Engine options
 
 | Option | Purpose | Guidance |
@@ -51,4 +71,3 @@ The alpha API is read-only:
 - `GET /v1/config` — effective configuration with common secrets redacted
 
 Send `Authorization: Bearer <api_token>` with every request.
-

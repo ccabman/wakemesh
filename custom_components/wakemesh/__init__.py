@@ -12,14 +12,27 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import RouterApiClient
-from .const import CONF_TOKEN
+from .const import (
+    CONF_ENTRY_TYPE,
+    CONF_TOKEN,
+    ENTRY_TYPE_ENGINE,
+    ENTRY_TYPE_SPEAKER,
+)
 
-PLATFORMS = ["sensor"]
+ENGINE_PLATFORMS = ["sensor"]
+SPEAKER_PLATFORMS = ["media_player", "number"]
 LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up the router API client."""
+    """Set up an Engine or AirPlay speaker entry."""
+    entry_type = entry.data.get(CONF_ENTRY_TYPE, ENTRY_TYPE_ENGINE)
+    if entry_type == ENTRY_TYPE_SPEAKER:
+        await hass.config_entries.async_forward_entry_setups(
+            entry, SPEAKER_PLATFORMS
+        )
+        return True
+
     client = RouterApiClient(
         async_get_clientsession(hass),
         entry.data[CONF_URL],
@@ -34,10 +47,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = {"client": client, "coordinator": coordinator}
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, ENGINE_PLATFORMS)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload the router client."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    """Unload the configured WakeMesh entry."""
+    platforms = (
+        SPEAKER_PLATFORMS
+        if entry.data.get(CONF_ENTRY_TYPE) == ENTRY_TYPE_SPEAKER
+        else ENGINE_PLATFORMS
+    )
+    return await hass.config_entries.async_unload_platforms(entry, platforms)

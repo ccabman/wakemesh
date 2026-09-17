@@ -1,6 +1,6 @@
 # WakeMesh
 
-**Turn network audio sources into local Home Assistant voice satellites.**
+**Turn network audio sources into local Home Assistant voice satellites—and deliver reliable announcements to HomePods.**
 
 [![Tests](https://github.com/ccabman/wakemesh/actions/workflows/tests.yml/badge.svg)](https://github.com/ccabman/wakemesh/actions/workflows/tests.yml)
 [![Release](https://img.shields.io/github/v/release/ccabman/wakemesh?include_prereleases&label=release)](https://github.com/ccabman/wakemesh/releases)
@@ -28,6 +28,10 @@ logical voice satellites without requiring a speaker beside every microphone.
 - Send responses to Home Assistant media players
 - Keep speech processing and routing on the local network
 - Expose health and worker diagnostics through a versioned local API
+- Discover HomePods without manually entering MAC addresses
+- Present true HomePod stereo pairs as one synchronized destination
+- Raise announcement volume by configurable percentage points
+- Restore volume and resume interrupted playback after announcements
 
 ## How it works
 
@@ -50,16 +54,18 @@ The repository contains two components:
 
 - `app/` — the Home Assistant add-on and long-running audio data plane.
 - `custom_components/wakemesh/` — the Home Assistant integration and control
-  plane. The integration currently provides setup and worker-status sensors.
+  plane. It provides engine status plus native media-player destinations for
+  reliable HomePod announcements.
 
 See [Architecture](docs/architecture.md) for the design and roadmap.
 
 ## Current status
 
-WakeMesh is at **0.1.x alpha**. The engine can run multiple configured sources
+WakeMesh is at **0.2.x alpha**. The engine can run multiple configured sources
 and satellites, process wake words through Linux Voice Assistant, and route
-responses to Home Assistant media players. Configuration is still owned by the
-add-on; moving authoritative configuration into the integration is planned.
+responses to Home Assistant media players. The integration can also discover
+HomePods, distinguish stereo pairs from temporary multi-room groups, stream
+announcements through the active pair leader, and restore prior playback.
 
 ## Installation
 
@@ -73,6 +79,23 @@ See the [installation guide](docs/installation.md). A concise outline:
    `custom_components/wakemesh` into your Home Assistant configuration.
 6. Validate audio, wake-word behavior, and response routing before enabling
    additional satellites.
+
+### AirPlay announcement destinations
+
+1. Open **Settings → Devices & services → WakeMesh → Add entry**.
+2. Choose **AirPlay announcement destination**.
+3. Select a discovered HomePod or stereo pair. Already configured destinations
+   are omitted automatically.
+4. Assign the resulting WakeMesh device to an area.
+5. Use its media player anywhere Home Assistant accepts a playback destination.
+
+Each destination also provides **Idle Announcement Volume** and **Playing
+Announcement Boost** controls. The boost is expressed in percentage points: if
+music is playing at 20% and boost is 10, the announcement plays at 30%.
+
+WakeMesh collapses only genuine Apple stereo pairs. Temporary multi-room
+playback groups remain separate so individual HomePods are not accidentally
+treated as permanent pairs.
 
 ## Configuration example
 

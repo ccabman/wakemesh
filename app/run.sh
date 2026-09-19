@@ -38,7 +38,7 @@ register_worker() {
 }
 
 /usr/local/bin/control_api.py --port "$API_PORT" --token "$API_TOKEN" \
-  --version "0.1.7" --runtime-dir /data/runtime &
+  --version "0.1.8" --runtime-dir /data/runtime &
 PIDS+=("$!")
 register_worker control_api control_api "$!" system
 
@@ -79,15 +79,21 @@ while IFS= read -r source; do
     STOP_WORD="$(jq -r '.stop_word' <<<"$assistant")"
     HOMEPOD_ENTITY="$(jq -r '.response_player' <<<"$assistant")"
     HOMEPOD_VOLUME="$(jq -r '.response_volume' <<<"$assistant")"
+    INITIAL_CHIME="$(jq -r '.initial_chime // ""' <<<"$assistant")"
+    STOP_MUSIC_ON_WAKE="$(jq -r '.stop_music_on_wake // false' <<<"$assistant")"
     ROUTER_ID="${SOURCE_ID}_${ASSISTANT_ID}"
     DEVICE_SUFFIX="$(printf '%s' "$ROUTER_ID" | sha256sum | cut -c1-6)"
     VOICE_SINK="voice_${ROUTER_ID}"
+    WAKE_EVENT_FILE="/data/runtime/wake_${ROUTER_ID}"
+    rm -f "$WAKE_EVENT_FILE"
 
     pactl load-module module-null-sink \
       sink_name="$VOICE_SINK" format=s16le rate=22050 channels=1 >/dev/null
 
     env ROUTER_ID="$ROUTER_ID" VOICE_SINK="$VOICE_SINK" \
       HOMEPOD_ENTITY="$HOMEPOD_ENTITY" HOMEPOD_VOLUME="$HOMEPOD_VOLUME" \
+      INITIAL_CHIME="$INITIAL_CHIME" STOP_MUSIC_ON_WAKE="$STOP_MUSIC_ON_WAKE" \
+      WAKEMESH_WAKE_EVENT_FILE="$WAKE_EVENT_FILE" \
     /usr/local/bin/response_router.py &
     PIDS+=("$!")
     register_worker "router_${ROUTER_ID}" response_router "$!" "$SOURCE_ID"
@@ -114,6 +120,7 @@ while IFS= read -r source; do
     echo "Starting ${NAME}; source=${SOURCE_ID}; ESPHome port=${PORT}; wake=${WAKE_WORD}"
     env PULSE_SOURCE="${CAMERA_SINK}.monitor" PULSE_SINK="$VOICE_SINK" \
       LVA_DEVICE_SUFFIX="$DEVICE_SUFFIX" \
+      WAKEMESH_WAKE_EVENT_FILE="$WAKE_EVENT_FILE" \
       python3 -m linux_voice_assistant "${ARGS[@]}" &
     PIDS+=("$!")
     register_worker "satellite_${ROUTER_ID}" assist_satellite "$!" "$SOURCE_ID"

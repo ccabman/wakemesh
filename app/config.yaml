@@ -1,5 +1,5 @@
 name: WakeMesh Engine
-version: "0.1.7"
+version: "0.1.8"
 slug: wakemesh_engine
 description: Camera and network audio sources as Home Assistant voice satellites
 url: https://github.com/ccabman/wakemesh
@@ -34,6 +34,8 @@ options:
           stop_word: stop
           response_player: media_player.living_room
           response_volume: 0.3
+          initial_chime: ""
+          stop_music_on_wake: false
 schema:
   api_port: port
   api_token: password
@@ -52,3 +54,5 @@ schema:
           stop_word: str
           response_player: str
           response_volume: float(0,1)
+          initial_chime: str?
+          stop_music_on_wake: bool?

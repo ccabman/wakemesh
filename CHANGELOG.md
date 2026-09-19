@@ -4,6 +4,8 @@ All notable changes to WakeMesh are documented here.
 
 ## [Unreleased]
 
+- Add optional initial chimes that are joined to the spoken response as one stream.
+- Add per-assistant wake-word music preemption with playback-state preservation.
 - Add automatic HomePod discovery and native WakeMesh media-player destinations.
 - Detect genuine HomePod stereo pairs and route through the active group leader.
 - Keep temporary AirPlay multi-room groups as separate destinations.

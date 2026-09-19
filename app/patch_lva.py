@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Give each WakeMesh satellite a distinct ESPHome/mDNS device identity."""
+"""Apply the small WakeMesh hooks needed by Linux Voice Assistant."""
 
 from pathlib import Path
 import sysconfig
@@ -33,7 +33,39 @@ else:
 
 path.write_text(source, encoding="utf-8")
 
+satellite_path = path.with_name("satellite.py")
+satellite_source = satellite_path.read_text(encoding="utf-8")
+if "import os\n" not in satellite_source:
+    satellite_source = satellite_source.replace("import logging\n", "import logging\nimport os\n", 1)
+if "from pathlib import Path\n" not in satellite_source:
+    satellite_source = satellite_source.replace(
+        "from functools import partial\n", "from functools import partial\nfrom pathlib import Path\n", 1
+    )
+
+wake_anchor = "        self._emit(LVAEvent.WAKE_WORD_DETECTED)\n        self.duck()\n"
+wake_hook = (
+    "        self._emit(LVAEvent.WAKE_WORD_DETECTED)\n"
+    "        # WakeMesh hook: notify the response router before listening begins.\n"
+    "        wake_event_file = os.environ.get(\"WAKEMESH_WAKE_EVENT_FILE\")\n"
+    "        if wake_event_file:\n"
+    "            try:\n"
+    "                Path(wake_event_file).touch()\n"
+    "            except OSError:\n"
+    "                _LOGGER.exception(\"Unable to emit WakeMesh wake event\")\n"
+    "        self.duck()\n"
+)
+if "WakeMesh hook: notify the response router" in satellite_source:
+    pass
+elif wake_anchor in satellite_source:
+    satellite_source = satellite_source.replace(wake_anchor, wake_hook, 1)
+else:
+    raise RuntimeError("Unable to locate LVA wake-word event")
+
+satellite_path.write_text(satellite_source, encoding="utf-8")
+
 verified = path.read_text(encoding="utf-8")
 if "WakeMesh virtual MAC" not in verified:
     raise RuntimeError(f"LVA identity patch verification failed: {path}")
-print(f"WakeMesh identity patch verified: {path}", flush=True)
+if "WakeMesh hook: notify the response router" not in satellite_path.read_text(encoding="utf-8"):
+    raise RuntimeError(f"LVA wake-event patch verification failed: {satellite_path}")
+print(f"WakeMesh patches verified: {path}, {satellite_path}", flush=True)

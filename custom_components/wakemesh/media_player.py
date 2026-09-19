@@ -268,7 +268,12 @@ class RaopAnnouncementPlayer(MediaPlayerEntity):
     ) -> None:
         """Push audio over RAOP and restore prior music playback."""
         source = self.hass.states.get(self._source_entity)
-        was_playing = source is not None and source.state == STATE_PLAYING
+        extra = kwargs.get("extra") or {}
+        was_preempted = bool(extra.get("wakemesh_preempted_playback"))
+        preempted_volume = extra.get("wakemesh_original_volume")
+        was_playing = was_preempted or (
+            source is not None and source.state == STATE_PLAYING
+        )
         path = None
         player = None
         original_volume = None
@@ -296,6 +301,8 @@ class RaopAnnouncementPlayer(MediaPlayerEntity):
                 _LOGGER.debug("Could not read current RAOP playback state", exc_info=True)
             try:
                 original_volume = player.audio.volume
+                if preempted_volume is not None:
+                    original_volume = float(preempted_volume) * 100.0
                 if original_volume is not None:
                     announcement_volume = (
                         min(100.0, original_volume + self._playing_volume_boost)

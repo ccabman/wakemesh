@@ -51,6 +51,13 @@ when it was previously active.
 | `stop_word` | Stop-word model name | Usually `stop` |
 | `response_player` | Home Assistant media-player entity | Example: `media_player.living_room` |
 | `response_volume` | Playback volume | Range `0.0`–`1.0` |
+| `initial_chime` | Optional audio prepended to the spoken response | Use a `/media/...` path or HTTP(S) URL; leave blank for none |
+| `stop_music_on_wake` | Pause active destination audio as soon as the wake word triggers | `true` gives the listener immediate quiet; prior playback resumes after the response |
+
+Place uploaded chimes in Home Assistant's `media` share and enter the in-container
+path, such as `/media/wakemesh/chimes/attention.mp3`. WakeMesh combines the chime
+and speech into one announcement stream, which avoids a gap or a second AirPlay
+session between them.
 
 ## Tuning
 

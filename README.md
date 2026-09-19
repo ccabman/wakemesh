@@ -31,6 +31,8 @@ logical voice satellites without requiring a speaker beside every microphone.
 - Discover HomePods without manually entering MAC addresses
 - Present true HomePod stereo pairs as one synchronized destination
 - Raise announcement volume by configurable percentage points
+- Optionally prepend a local or remote chime to each response
+- Pause assigned music immediately when a wake word is accepted
 - Restore volume and resume interrupted playback after announcements
 
 ## How it works
@@ -117,6 +119,8 @@ sources:
         stop_word: stop
         response_player: media_player.living_room
         response_volume: 0.3
+        initial_chime: /media/wakemesh/chimes/attention.mp3
+        stop_music_on_wake: true
 ```
 
 Start with `enabled: false`, confirm the stream and response target, and only
